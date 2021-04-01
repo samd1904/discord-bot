@@ -15,9 +15,9 @@ var dbStat = false;
 var tOut;
 
 function closeConnection() {
-    dbStat = false;
-    globalLogs("database connection closed");
-    dbClient.close();
+    // dbStat = false;
+    // globalLogs("database connection closed");
+    // dbClient.close();
 }
 
 //bot code
@@ -32,13 +32,14 @@ dsClient.once('ready', async () => {
         globalLogs("Connected to database");
     } catch (err) {
         globalLogs("DB connection error: " + err);
-    }finally{
-        tOut = setTimeout(closeConnection, 60000);
+    } finally {
+        //tOut = setTimeout(closeConnection, 60000);
     }
 });
 dsClient.on("message", async msg => {
     if (msg.content.startsWith(activator)) {
-        if (dbStat) {
+        //timeout code to open db connection if closed
+        /*if (dbStat) {
             clearTimeout(tOut);
         } else {
             try {
@@ -48,7 +49,7 @@ dsClient.on("message", async msg => {
             } catch (err) {
                 globalLogs("DB connection error: " + err);
             }
-        }
+        }*/
         var str = msg.content.split(" ");
         var action = str[0];
         var preReqs = {
@@ -100,6 +101,25 @@ dsClient.on("message", async msg => {
                 }
                 break;
             case activator + "remove":
+                try {
+                    var data = {
+                        "_id": msg.author.id,
+                        "gId": msg.guild.id,
+                        "link": {
+                            "platform": str[1],
+                            "url": str[2]
+                        }
+                    };
+                    var success = await service.remove(data, preReqs);
+                    if (success) {
+                        msg.channel.send("Done");
+                    } else {
+                        msg.channel.send("Something went wrong, please contact my maker!!");
+                    }
+                } catch (error) {
+                    globalLogs("Error deleting link " + error);
+                    msg.channel.send("Something went wrong, please contact my maker!!");
+                }
                 break;
             case activator + "flip-table":
                 var roll = Math.trunc(Math.random() * 20 + 1);
@@ -116,7 +136,8 @@ dsClient.on("message", async msg => {
             default:
                 msg.channel.send("Sorry, can't help you with that :(");
         }
-        tOut = setTimeout(closeConnection, 60000);
+        //sets timeout to close db connection after sometime
+        // tOut = setTimeout(closeConnection, 60000);
     }
 });
 
