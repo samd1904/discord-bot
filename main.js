@@ -105,16 +105,13 @@ dsClient.on("message", async msg => {
                     var data = {
                         "_id": msg.author.id,
                         "gId": msg.guild.id,
-                        "link": {
-                            "platform": str[1],
-                            "url": str[2]
-                        }
+                        "platform": str[1]
                     };
                     var success = await service.remove(data, preReqs);
                     if (success) {
                         msg.channel.send("Done");
                     } else {
-                        msg.channel.send("Something went wrong, please contact my maker!!");
+                        msg.channel.send("Found nothing sorry :(");
                     }
                 } catch (error) {
                     globalLogs("Error deleting link " + error);
@@ -131,7 +128,7 @@ dsClient.on("message", async msg => {
                 break;
             case activator + "h":
             case activator + "help":
-                msg.channel.send("Here to help");
+                msg.channel.send("https://github.com/samd1904/discord-bot");
                 break;
             default:
                 msg.channel.send("Sorry, can't help you with that :(");
